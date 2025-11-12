@@ -1,0 +1,21 @@
+export interface Category {
+  id: string;
+  name: string;
+  icon: string;
+}
+
+export interface Message {
+  id: string;
+  text: string;
+  sender: 'user' | 'assistant' | 'system';
+  timestamp: Date;
+  category?: string;
+  suggestions?: string[];
+}
+
+export interface ChatResponse {
+  response: string;
+  category: string;
+  suggestions?: string[];
+}
+
