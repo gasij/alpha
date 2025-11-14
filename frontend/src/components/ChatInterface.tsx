@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Message } from '../types';
-import './ChatInterface.css';
 
 interface ChatInterfaceProps {
   messages: Message[];
@@ -63,28 +62,58 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   };
 
   return (
-    <div className="chat-interface">
-      <div className="chat-messages">
-        {messages.map((message) => (
+    <div className="flex-1 flex flex-col glass-card rounded-xl overflow-hidden min-h-[500px] max-h-[calc(100vh-300px)] animate-scale-in">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 flex flex-col gap-4 custom-scrollbar">
+        {messages.map((message, index) => (
           <div
             key={message.id}
-            className={`message message-${message.sender}`}
+            className={`
+              flex flex-col max-w-[80%] sm:max-w-[75%] 
+              animate-fade-in-up
+              transition-all duration-300 hover:scale-[1.02]
+              ${
+                message.sender === 'user'
+                  ? 'self-end'
+                  : message.sender === 'system'
+                  ? 'self-center max-w-full'
+                  : 'self-start'
+              }
+            `}
+            style={{ animationDelay: `${index * 0.05}s` }}
           >
             {message.sender === 'system' ? (
-              <div className="system-message">{message.text}</div>
+              <div className="px-4 py-2 bg-primary/20 text-primary border border-primary/30 rounded-xl text-sm text-center italic animate-scale-in hover:bg-primary/25 transition-colors">
+                {message.text}
+              </div>
             ) : (
               <>
-                <div className="message-content">
-                  <div className="message-text">{message.text}</div>
-                  <div className="message-time">{formatTime(message.timestamp)}</div>
+                <div
+                  className={`
+                    px-4 py-3 rounded-2xl relative
+                    transition-all duration-300
+                    hover:shadow-lg
+                    ${
+                      message.sender === 'user'
+                        ? 'bg-primary text-primary-foreground rounded-br-md shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:scale-[1.02]'
+                        : 'bg-card/80 text-card-foreground border border-border/50 rounded-bl-md backdrop-blur-sm hover:border-primary/30 hover:bg-card/90'
+                    }
+                  `}
+                >
+                  <div className="text-sm sm:text-base leading-relaxed whitespace-pre-wrap break-words">
+                    {message.text}
+                  </div>
+                  <div className="text-xs opacity-70 mt-2 transition-opacity hover:opacity-100">
+                    {formatTime(message.timestamp)}
+                  </div>
                 </div>
                 {message.suggestions && message.suggestions.length > 0 && (
-                  <div className="suggestions">
+                  <div className="flex flex-wrap gap-2 mt-2 animate-fade-in" style={{ animationDelay: '0.2s' }}>
                     {message.suggestions.map((suggestion, idx) => (
                       <button
                         key={idx}
-                        className="suggestion-button"
                         onClick={() => handleSuggestionClick(suggestion)}
+                        className="px-3 py-1.5 text-xs sm:text-sm glass-button rounded-full text-primary hover:bg-primary/20 hover:border-primary/50 transition-all hover:scale-110 active:scale-95 hover:shadow-lg hover:shadow-primary/20 animate-scale-in"
+                        style={{ animationDelay: `${0.3 + idx * 0.05}s` }}
                       >
                         {suggestion}
                       </button>
@@ -96,29 +125,32 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           </div>
         ))}
         {isLoading && (
-          <div className="message message-assistant">
-            <div className="message-content">
-              <div className="loading-dots">
-                <span></span>
-                <span></span>
-                <span></span>
+          <div className="flex self-start max-w-[75%] animate-fade-in-up">
+            <div className="px-4 py-3 bg-card/80 text-card-foreground border border-border/50 rounded-2xl rounded-bl-md backdrop-blur-sm">
+              <div className="flex gap-2 items-center">
+                <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms', animationDuration: '1.4s' }}></span>
+                <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms', animationDuration: '1.4s' }}></span>
+                <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms', animationDuration: '1.4s' }}></span>
               </div>
             </div>
           </div>
         )}
         {error && (
-          <div className="message message-error">
-            <div className="message-content">
-              <div className="message-text error-text">{error}</div>
+          <div className="flex self-start max-w-[75%] animate-fade-in-up">
+            <div className="px-4 py-3 bg-destructive/20 text-destructive border border-destructive/30 rounded-2xl rounded-bl-md">
+              <div className="text-sm font-medium">{error}</div>
             </div>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
-      <form className="chat-input-form" onSubmit={handleSubmit}>
+      <form
+        onSubmit={handleSubmit}
+        className="flex gap-3 p-4 sm:p-5 border-t border-border/40 glass transition-all hover:border-primary/20"
+      >
         <textarea
           ref={inputRef}
-          className="chat-input"
+          className="flex-1 glass-input rounded-2xl px-4 py-3 text-foreground placeholder:text-muted-foreground resize-none max-h-[150px] focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all hover:border-primary/30"
           value={input}
           onChange={handleInputChange}
           onKeyPress={handleKeyPress}
@@ -128,10 +160,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         />
         <button
           type="submit"
-          className="send-button"
           disabled={!input.trim() || isLoading}
+          className="w-12 h-12 sm:w-14 sm:h-14 rounded-full glass-button text-primary-foreground disabled:opacity-50 disabled:cursor-not-allowed hover:scale-110 active:scale-95 transition-all flex items-center justify-center flex-shrink-0 hover:shadow-lg hover:shadow-primary/30 group"
         >
-          <span className="send-icon">➤</span>
+          <span className="text-xl sm:text-2xl transform rotate-[-90deg] group-hover:translate-x-0.5 transition-transform">➤</span>
         </button>
       </form>
     </div>
@@ -139,4 +171,3 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 };
 
 export default ChatInterface;
-

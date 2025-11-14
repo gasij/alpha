@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import './App.css';
 import ChatInterface from './components/ChatInterface';
 import CategorySelector from './components/CategorySelector';
 import Header from './components/Header';
+import AnimatedBackground from './components/AnimatedBackground';
 import { Category, Message } from './types';
 import { getCategories, sendMessage } from './services/api';
 
@@ -88,7 +88,7 @@ const App: React.FC = () => {
     if (category) {
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
-        text: `Переключено на категорию: ${category.name} ${category.icon}`,
+        text: `Переключено на категорию: ${category.name}`,
         sender: 'system',
         timestamp: new Date()
       }]);
@@ -96,24 +96,36 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="app">
-      <Header />
-      <div className="app-container">
-        <CategorySelector
-          categories={categories}
-          selectedCategory={selectedCategory}
-          onCategoryChange={handleCategoryChange}
-        />
-        <ChatInterface
-          messages={messages}
-          onSendMessage={handleSendMessage}
-          isLoading={isLoading}
-          error={error}
-        />
+    <div className="min-h-screen flex flex-col bg-background relative overflow-hidden">
+      <AnimatedBackground />
+      
+      <div className="relative z-10 flex flex-col flex-1">
+        <Header />
+        <div className="flex-1 container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-7xl">
+          <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
+            {/* Боковое меню */}
+            <aside className="w-full lg:w-64 flex-shrink-0">
+              <CategorySelector
+                categories={categories}
+                selectedCategory={selectedCategory}
+                onCategoryChange={handleCategoryChange}
+              />
+            </aside>
+            
+            {/* Основной контент - чат */}
+            <main className="flex-1 min-w-0">
+              <ChatInterface
+                messages={messages}
+                onSendMessage={handleSendMessage}
+                isLoading={isLoading}
+                error={error}
+              />
+            </main>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
 
 export default App;
-
