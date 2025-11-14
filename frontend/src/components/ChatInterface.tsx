@@ -62,7 +62,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   };
 
   return (
-    <div className="flex-1 flex flex-col glass-card rounded-xl overflow-hidden min-h-[500px] max-h-[calc(100vh-300px)] animate-scale-in">
+    <div className="flex-1 flex flex-col bg-white rounded-xl overflow-hidden min-h-[500px] max-h-[calc(100vh-300px)] shadow-sm border border-border animate-scale-in">
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 flex flex-col gap-4 custom-scrollbar">
         {messages.map((message, index) => (
           <div
@@ -70,7 +70,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             className={`
               flex flex-col max-w-[80%] sm:max-w-[75%] 
               animate-fade-in-up
-              transition-all duration-300 hover:scale-[1.02]
+              transition-all duration-300 hover:scale-[1.01]
               ${
                 message.sender === 'user'
                   ? 'self-end'
@@ -82,7 +82,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             style={{ animationDelay: `${index * 0.05}s` }}
           >
             {message.sender === 'system' ? (
-              <div className="px-4 py-2 bg-primary/20 text-primary border border-primary/30 rounded-xl text-sm text-center italic animate-scale-in hover:bg-primary/25 transition-colors">
+              <div className="px-4 py-2 bg-primary/10 text-primary border border-primary/20 rounded-xl text-sm text-center italic animate-scale-in">
                 {message.text}
               </div>
             ) : (
@@ -91,11 +91,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                   className={`
                     px-4 py-3 rounded-2xl relative
                     transition-all duration-300
-                    hover:shadow-lg
+                    hover:shadow-md
                     ${
                       message.sender === 'user'
-                        ? 'bg-primary text-primary-foreground rounded-br-md shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:scale-[1.02]'
-                        : 'bg-card/80 text-card-foreground border border-border/50 rounded-bl-md backdrop-blur-sm hover:border-primary/30 hover:bg-card/90'
+                        ? 'bg-primary text-white rounded-br-md shadow-md'
+                        : 'bg-muted text-foreground border border-border rounded-bl-md'
                     }
                   `}
                 >
@@ -112,7 +112,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                       <button
                         key={idx}
                         onClick={() => handleSuggestionClick(suggestion)}
-                        className="px-3 py-1.5 text-xs sm:text-sm glass-button rounded-full text-primary hover:bg-primary/20 hover:border-primary/50 transition-all hover:scale-110 active:scale-95 hover:shadow-lg hover:shadow-primary/20 animate-scale-in"
+                        className="px-3 py-1.5 text-xs sm:text-sm bg-white border border-primary/30 text-primary rounded-full hover:bg-primary hover:text-white hover:border-primary transition-all hover:scale-105 active:scale-95 hover:shadow-sm animate-scale-in"
                         style={{ animationDelay: `${0.3 + idx * 0.05}s` }}
                       >
                         {suggestion}
@@ -126,7 +126,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         ))}
         {isLoading && (
           <div className="flex self-start max-w-[75%] animate-fade-in-up">
-            <div className="px-4 py-3 bg-card/80 text-card-foreground border border-border/50 rounded-2xl rounded-bl-md backdrop-blur-sm">
+            <div className="px-4 py-3 bg-muted text-foreground border border-border rounded-2xl rounded-bl-md">
               <div className="flex gap-2 items-center">
                 <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms', animationDuration: '1.4s' }}></span>
                 <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms', animationDuration: '1.4s' }}></span>
@@ -137,7 +137,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         )}
         {error && (
           <div className="flex self-start max-w-[75%] animate-fade-in-up">
-            <div className="px-4 py-3 bg-destructive/20 text-destructive border border-destructive/30 rounded-2xl rounded-bl-md">
+            <div className="px-4 py-3 bg-destructive/10 text-destructive border border-destructive/30 rounded-2xl rounded-bl-md">
               <div className="text-sm font-medium">{error}</div>
             </div>
           </div>
@@ -146,11 +146,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       </div>
       <form
         onSubmit={handleSubmit}
-        className="flex gap-3 p-4 sm:p-5 border-t border-border/40 glass transition-all hover:border-primary/20"
+        className="flex gap-3 p-4 sm:p-5 border-t border-border bg-white"
       >
         <textarea
           ref={inputRef}
-          className="flex-1 glass-input rounded-2xl px-4 py-3 text-foreground placeholder:text-muted-foreground resize-none max-h-[150px] focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all hover:border-primary/30"
+          className="flex-1 bg-muted rounded-2xl px-4 py-3 text-foreground placeholder:text-muted-foreground resize-none max-h-[150px] focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all border border-border"
           value={input}
           onChange={handleInputChange}
           onKeyPress={handleKeyPress}
@@ -161,7 +161,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         <button
           type="submit"
           disabled={!input.trim() || isLoading}
-          className="w-12 h-12 sm:w-14 sm:h-14 rounded-full glass-button text-primary-foreground disabled:opacity-50 disabled:cursor-not-allowed hover:scale-110 active:scale-95 transition-all flex items-center justify-center flex-shrink-0 hover:shadow-lg hover:shadow-primary/30 group"
+          className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-primary text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary/90 active:bg-primary/80 transition-all flex items-center justify-center flex-shrink-0 shadow-md hover:shadow-lg group"
         >
           <span className="text-xl sm:text-2xl transform rotate-[-90deg] group-hover:translate-x-0.5 transition-transform">➤</span>
         </button>

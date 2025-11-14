@@ -13,7 +13,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
   onCategoryChange,
 }) => {
   return (
-    <nav className="glass-card rounded-xl p-2 animate-slide-up" style={{ animationDelay: '0.3s' }}>
+    <nav className="bg-white rounded-xl p-2 shadow-sm border border-border animate-slide-up" style={{ animationDelay: '0.3s' }}>
       <ul className="flex flex-col gap-1">
         {categories.map((category, index) => (
           <li key={category.id}>
@@ -26,8 +26,8 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
                 animate-scale-in
                 ${
                   selectedCategory === category.id
-                    ? 'bg-primary/20 text-primary border-l-4 border-primary shadow-sm'
-                    : 'text-foreground hover:bg-primary/10 hover:text-primary border-l-4 border-transparent'
+                    ? 'bg-primary text-white border-l-4 border-primary shadow-md font-semibold'
+                    : 'text-foreground hover:bg-primary/5 hover:text-primary border-l-4 border-transparent hover:border-primary/30'
                 }
               `}
               style={{ animationDelay: `${0.4 + index * 0.05}s` }}
@@ -35,12 +35,9 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
               <span className="relative z-10 flex items-center">
                 <span className="flex-1">{category.name}</span>
                 {selectedCategory === category.id && (
-                  <span className="w-2 h-2 bg-primary rounded-full"></span>
+                  <span className="w-2 h-2 bg-white rounded-full"></span>
                 )}
               </span>
-              {selectedCategory === category.id && (
-                <span className="absolute inset-0 bg-primary/5 rounded-lg"></span>
-              )}
             </button>
           </li>
         ))}
