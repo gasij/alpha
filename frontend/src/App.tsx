@@ -6,7 +6,8 @@ import AnimatedBackground from './components/AnimatedBackground';
 import AuthModal from './components/AuthModal';
 import RegisterModal from './components/RegisterModal';
 import ProfileModal from './components/ProfileModal';
-import { Category, Message, User } from './types';
+import HistoryModal from './components/HistoryModal';
+import { Category, Message, User, ChatHistory } from './types';
 import { getCategories, sendMessage } from './services/api';
 
 const App: React.FC = () => {
@@ -21,6 +22,10 @@ const App: React.FC = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  
+  // History state
+  const [chatHistory, setChatHistory] = useState<ChatHistory[]>([]);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
 
   useEffect(() => {
     loadCategories();
@@ -31,6 +36,27 @@ const App: React.FC = () => {
         setUser(JSON.parse(savedUser));
       } catch (e) {
         localStorage.removeItem('user');
+      }
+    }
+    
+    // Загружаем историю из localStorage
+    const savedHistory = localStorage.getItem('chatHistory');
+    if (savedHistory) {
+      try {
+        const history = JSON.parse(savedHistory);
+        // Преобразуем даты обратно в объекты Date
+        const parsedHistory = history.map((item: any) => ({
+          ...item,
+          createdAt: new Date(item.createdAt),
+          messages: item.messages.map((msg: any) => ({
+            ...msg,
+            timestamp: new Date(msg.timestamp),
+          })),
+        }));
+        setChatHistory(parsedHistory);
+      } catch (e) {
+        console.error('Ошибка загрузки истории:', e);
+        localStorage.removeItem('chatHistory');
       }
     }
     
@@ -77,7 +103,33 @@ const App: React.FC = () => {
         category: selectedCategory,
         suggestions: response.suggestions
       };
-      setMessages(prev => [...prev, assistantMessage]);
+      
+      setMessages(prev => {
+        const newMessages = [...prev, userMessage, assistantMessage];
+        
+        // Сохраняем в историю, если это не системное сообщение
+        const conversationMessages = newMessages.filter(
+          (msg) => msg.sender !== 'system' && msg.id !== '1' // Исключаем приветственное сообщение
+        );
+        
+        if (conversationMessages.length > 0) {
+          const historyItem: ChatHistory = {
+            id: Date.now().toString(),
+            messages: conversationMessages,
+            category: selectedCategory,
+            createdAt: new Date(),
+            title: text.trim().length > 50 ? text.trim().substring(0, 50) + '...' : text.trim(),
+          };
+          
+          setChatHistory(prevHistory => {
+            const updatedHistory = [historyItem, ...prevHistory].slice(0, 50); // Храним последние 50 запросов
+            localStorage.setItem('chatHistory', JSON.stringify(updatedHistory));
+            return updatedHistory;
+          });
+        }
+        
+        return newMessages;
+      });
     } catch (err: any) {
       console.error('Ошибка при отправке сообщения:', err);
       
@@ -166,6 +218,16 @@ const App: React.FC = () => {
     setShowProfileModal(false);
   };
 
+  const handleLoadHistory = (historyMessages: Message[]) => {
+    setMessages(historyMessages);
+  };
+
+  const handleDeleteHistory = (id: string) => {
+    const updatedHistory = chatHistory.filter((item) => item.id !== id);
+    setChatHistory(updatedHistory);
+    localStorage.setItem('chatHistory', JSON.stringify(updatedHistory));
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background relative overflow-hidden">
       <AnimatedBackground />
@@ -184,6 +246,8 @@ const App: React.FC = () => {
                 categories={categories}
                 selectedCategory={selectedCategory}
                 onCategoryChange={handleCategoryChange}
+                onHistoryClick={() => setShowHistoryModal(true)}
+                onExampleClick={handleSendMessage}
               />
             </aside>
             
@@ -230,6 +294,14 @@ const App: React.FC = () => {
           onLogout={handleLogout}
         />
       )}
+
+      <HistoryModal
+        isOpen={showHistoryModal}
+        onClose={() => setShowHistoryModal(false)}
+        history={chatHistory}
+        onLoadHistory={handleLoadHistory}
+        onDeleteHistory={handleDeleteHistory}
+      />
     </div>
   );
 };

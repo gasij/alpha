@@ -31,3 +31,11 @@ export interface AuthResponse {
   user: User;
   token: string;
 }
+
+export interface ChatHistory {
+  id: string;
+  messages: Message[];
+  category: string;
+  createdAt: Date;
+  title?: string;
+}

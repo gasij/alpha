@@ -29,8 +29,7 @@ const Header: React.FC<HeaderProps> = ({ user, onLoginClick, onProfileClick }) =
                 onClick={onProfileClick}
                 className="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-all border border-primary/20 font-medium"
               >
-                <span className="hidden sm:inline">{user.name}</span>
-                <span className="text-lg">👤</span>
+                <span>{user.name}</span>
               </button>
             ) : (
               <button
